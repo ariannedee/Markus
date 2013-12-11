@@ -113,8 +113,8 @@ class GradeEntryFormsController < ApplicationController
         @grade_entry_form.id.to_s + '_sort_by_grades'
     if params[:sort_by].present?
       cookies[c_sort_by] = params[:sort_by]
-    else
-      params[:sort_by] = 'last_name'
+    elsif !cookies[c_sort_by]
+      cookies[c_sort_by] = 'user_name'
     end
     @sort_by = cookies[c_sort_by]
     @desc = params[:desc]
@@ -130,7 +130,7 @@ class GradeEntryFormsController < ApplicationController
     @students_total = all_students.size
     @alpha_pagination_options = @grade_entry_form.alpha_paginate(all_students,
                                                         @per_page,
-                                                        @students.total_pages)
+                                                        @sort_by)
     session[:alpha_pagination_options] = @alpha_pagination_options
     @alpha_category = @alpha_pagination_options.first
     @sort_by = cookies[c_sort_by]
@@ -156,7 +156,7 @@ class GradeEntryFormsController < ApplicationController
     if params[:sort_by].present?
       @sort_by = params[:sort_by]
     else
-      @sort_by = 'last_name'
+      @sort_by = 'user_name'
     end
 
     # Only re-compute the alpha_pagination_options for the drop-down menu
@@ -170,7 +170,7 @@ class GradeEntryFormsController < ApplicationController
       @alpha_pagination_options = @grade_entry_form.alpha_paginate(
                                      all_students,
                                      @per_page,
-                                     @students.total_pages)
+                                     @sort_by)
       @alpha_category = @alpha_pagination_options.first
       session[:alpha_pagination_options] = @alpha_pagination_options
     else
@@ -178,6 +178,7 @@ class GradeEntryFormsController < ApplicationController
       @alpha_category = params[:alpha_category]
     end
   end
+
   # Update a grade in the table
   def update_grade
     grade_entry_form = GradeEntryForm.find_by_id(params[:id])

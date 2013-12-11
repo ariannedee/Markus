@@ -107,13 +107,15 @@ class GradeEntryForm < ActiveRecord::Base
   end
 
   # An algorithm for determining the category names for alphabetical pagination
-  def alpha_paginate(all_grade_entry_students, per_page, total_pages)
-    alpha_categories = Array.new(2 * total_pages){[]}
+  def alpha_paginate(all_grade_entry_students, per_page, sort_by)
+    total_pages = (all_grade_entry_students.count / per_page.to_f).ceil
     alpha_pagination = []
 
     if total_pages == 0
       return alpha_pagination
     end
+
+    alpha_categories = Array.new(2 * total_pages){[]}
 
     i = 0
     (1..(total_pages - 1)).each do |page|
@@ -124,9 +126,16 @@ class GradeEntryForm < ActiveRecord::Base
       # on a particular page and the first student on the next page. For example, if these
       # names are "Alwyn, Anderson, and Antheil", the category for this page would be:
       # "Al-And".
-      first_student = grade_entry_students1.first.last_name
-      last_student = grade_entry_students1.last.last_name
-      next_student = grade_entry_students2.first.last_name
+      if sort_by == 'user_name'
+        first_student = grade_entry_students1.first.user_name
+        last_student = grade_entry_students1.last.user_name
+        next_student = grade_entry_students2.first.user_name
+      else
+        first_student = grade_entry_students1.first.last_name
+        last_student = grade_entry_students1.last.last_name
+        next_student = grade_entry_students2.first.last_name
+      end
+
 
       # Update the possible categories
       alpha_categories = self.construct_alpha_category(first_student, last_student,
@@ -140,8 +149,14 @@ class GradeEntryForm < ActiveRecord::Base
     # Handle the last page
     page = total_pages
     grade_entry_students = all_grade_entry_students.paginate(:per_page => per_page, :page => page)
-    first_student = grade_entry_students.first.last_name
-    last_student = grade_entry_students.last.last_name
+
+    if sort_by == 'user_name'
+      first_student = grade_entry_students.first.user_name
+      last_student = grade_entry_students.last.user_name
+    else
+      first_student = grade_entry_students.first.last_name
+      last_student = grade_entry_students.last.last_name
+    end
 
     alpha_categories = self.construct_alpha_category(first_student, last_student, alpha_categories, i)
 
