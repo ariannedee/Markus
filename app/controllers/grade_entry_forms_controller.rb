@@ -38,8 +38,8 @@ class GradeEntryFormsController < ApplicationController
 
                           if sort_by.present?
                             if sort_by == 'section'
-                              Student.joins(:section).all(:conditions => conditions,
-                                  :order => 'sections.name ' + order)
+                              Student.includes(:section).all(:conditions => conditions,
+                                  :order => 'sections.name ' + order + ', user_name' )
                             else
                               Student.all(:conditions => conditions,
                                 :order => sort_by + ' ' + order)

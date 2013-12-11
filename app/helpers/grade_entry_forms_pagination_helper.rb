@@ -150,13 +150,20 @@ module GradeEntryFormsPaginationHelper
 
   def get_name_to_paginate(grade_entry_student, sort_by)
     if sort_by == 'user_name'
-      return grade_entry_student.user_name
+      return grade_entry_student.user_name || '-'
     elsif
       sort_by == 'last_name'
-      return grade_entry_student.last_name
+      return grade_entry_student.last_name || '-'
     elsif
       sort_by == 'first_name'
-      return grade_entry_student.first_name
+      return grade_entry_student.first_name || '-'
+    elsif
+      sort_by == 'section'
+      section = grade_entry_student.section
+      if section
+        return section.name + ':' + grade_entry_student.user_name
+      end
+      return '~:' + grade_entry_student.user_name
     end
   end
 
