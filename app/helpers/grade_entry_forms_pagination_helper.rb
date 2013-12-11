@@ -61,7 +61,7 @@ module GradeEntryFormsPaginationHelper
   end
 
   def get_filtered_items(hash, filter, sort_by, desc)
-    if desc.present?
+    if desc.present? && desc == 'true'
       order = 'DESC'
     else
       order = 'ASC'
