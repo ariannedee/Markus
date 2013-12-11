@@ -1,6 +1,6 @@
 <% # Allow the user to jump to a page containing certain students
 %>
-<% if sort_by == 'last_name' || sort_by == 'user_name' %>
+<% if sort_by == 'last_name' || sort_by == 'user_name' || sort_by == 'first_name' %>
 <%= label_tag "alpha_category", t('pagination.jump_to'), :class => "inline_label" %>
 <%= select_tag "alpha_category",
                 options_for_select(alpha_pagination_options, alpha_category),
