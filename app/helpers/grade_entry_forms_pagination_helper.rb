@@ -115,9 +115,8 @@ module GradeEntryFormsPaginationHelper
     alpha_categories = Array.new(2 * total_pages){[]}
 
     i = 0
-    (1..(total_pages - 1)).each do |page|
+    (1..(total_pages)).each do |page|
       grade_entry_students1 = all_grade_entry_students.paginate(:per_page => per_page, :page => page)
-      grade_entry_students2 = all_grade_entry_students.paginate(:per_page => per_page, :page => page+1)
 
       # To figure out the category names, we need to keep track of the first and last students
       # on a particular page and the first student on the next page. For example, if these
@@ -125,25 +124,19 @@ module GradeEntryFormsPaginationHelper
       # "Al-And".
       first_student = get_name_to_paginate(grade_entry_students1.first, sort_by)
       last_student = get_name_to_paginate(grade_entry_students1.last, sort_by)
-      next_student = get_name_to_paginate(grade_entry_students2.first, sort_by)
 
       # Update the possible categories
       alpha_categories = self.construct_alpha_category(first_student, last_student,
                                                        alpha_categories, i)
-      alpha_categories = self.construct_alpha_category(last_student, next_student,
-                                                       alpha_categories, i+1)
+      unless page == total_pages
+        grade_entry_students2 = all_grade_entry_students.paginate(:per_page => per_page, :page => page+1)
+        next_student = get_name_to_paginate(grade_entry_students2.first, sort_by)
+        alpha_categories = self.construct_alpha_category(last_student, next_student,
+                                                         alpha_categories, i+1)
+      end
 
       i += 2
     end
-
-    # Handle the last page
-    page = total_pages
-    grade_entry_students = all_grade_entry_students.paginate(:per_page => per_page, :page => page)
-
-    first_student = get_name_to_paginate(grade_entry_students.first, sort_by)
-    last_student = get_name_to_paginate(grade_entry_students.last, sort_by)
-
-    alpha_categories = self.construct_alpha_category(first_student, last_student, alpha_categories, i)
 
     # We can now form the category names
     j=0
